@@ -4,7 +4,8 @@ cust_email varchar2(20) NOT NULL PRIMARY KEY,
 full_name varchar2(20) NOT NULL,
 billing_address varchar2(20) NOT NULL,
 password_ varchar2(20) NOT NULL,
-phone number NOT NULL
+phone number NOT NULL,
+zipcode number
 );
 
 CREATE TABLE CUSTOMER__DELIVERY_ADDRESS
@@ -160,6 +161,9 @@ create table Purchase__Product
     foreign key (product_name)
     references general_product(product_name)
 );
+
+
+
 create table purchase__Staff
 (
   purchase_id varchar(20),

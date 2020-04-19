@@ -9,18 +9,3 @@ insert all
 into purchase values ('11',	'facebook@gmail.com',	'29-JAN-16',	'credit',	'9 apple ave',	'29-JAN-16')
 into purchase values ('12',	'facebook@gmail.com',	'1-FEB-16',	'credit',	'9 apple ave',	'1-FEB-16')
 select * from dual;
-
---adding derived column
-alter table purchase__product
-  add subtotal number(9,2);
-
-insert into purchase__product (subtotal)
-select
-  purchase_id,
-  unit_price,
-  quantity
-from
-  purchase__product,
-  general_product
-where
-  purchase__product.product__name = general_product.product_name;

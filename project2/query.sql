@@ -66,7 +66,7 @@ order by
 
 select
     product_name,
-    sum(quantity)
+    sum(quantity) as quantity
 from
     warehouse w,
     warehouse_inventory wi
@@ -105,6 +105,7 @@ order by
 
 -- 7. Using purchases made on or after jan 20, 2016, identify customers who eat meat. Display the customer name and email. Order the output by customer name. Note, you can replace children with other demographic characteristics. For instance, dog owners, seniors, vegetarians, Tesla car owners, etc. 
 
+select 'customers who eat meat' as title
 select
     full_name,
     c.cust_email
@@ -124,12 +125,83 @@ where
 order by
     full_name;
 
--- 8. Using purchases made in the last month, identify customers who are ill. Display two columns: customer zip code and number of customers. Display one row for each distinct zip code. Order the output by zip code. 
+-- 8. Using purchases made on or after january 20, 2016, identify customers who have not bought dairy products. Display two columns: customer zip code and number of customers. Display one row for each distinct zip code. Order the output by zip code. 
 
--- 9. Identify staff with the most deliveries in the last month. Display two columns: staff and number of deliveries. Display one row for each distinct staff. Display the staff with the most deliveries first. 
+select
+    count(*) as number_of_cust_who_didnt_buy_dairy,
+    zipcode
+from
+    purchase__product pp,
+    purchase p,
+    customer c,
+    general_product g,
+    product_type__product_name pt_pn
+where
+    pp.product_name = g.product_name and
+    g.product_name = pt_pn.product_name and
+    pp.purchase_id = p.purchase_id and
+    c.cust_email=p.cust_email and
+    time_purchased > '20-jan-16' and
+    NOT product_type = 'dairy'
+group by
+    zipcode
+order by 
+    zipcode;
 
--- 10. Identify products with low inventory. Display the product name, warehouse location and quantity. Order the output by product name. 
+-- 9. Identify staff with the most deliveries on or after jan 22, 2016. Display two columns: staff and number of deliveries. Display one row for each distinct staff. Display the staff with the most deliveries first. 
+
+select
+    staff_email,
+    count(p.purchase_id) as deliveries
+from
+    purchase__staff ps,
+    purchase p
+where
+    p.purchase_id = ps.purchase_id and
+    time_purchased >= '22-jan-16'
+group by
+    staff_email
+order by
+    count(p.purchase_id) desc;
+
+-- 10. Identify products with low inventory(quantity<6). Display the product name, warehouse location and quantity. Order the output by product name. 
+
+select
+    product_name,
+    address_,
+    quantity
+from
+    warehouse_inventory wi,
+    warehouse w
+where
+    w.warehouse_id = wi.warehouse_id and
+    quantity<6
+order by
+    product_name;
 
 -- 11.Display the structure of ALL tables using SQL Describe. 
 
+describe customer
+describe customer__delivery_address
+describe general_product
+describe job_
+describe product_type
+describe product_type__product_name
+describe purchase
+describe purchase__product
+describe purchase__staff
+describe specific_product
+describe staff
+describe staff_job_record
+describe warehouse
+describe warehouse__warehouse_type
+describe warehouse_inventory
+describe warehouse_type
+describe warehouse_type__product_type
+
+
+
 -- 12.Display the version of Oracle. Enter: SELECT * FROM v$version;
+
+SELECT * FROM v$version;
+

@@ -214,3 +214,121 @@ where product_id='23'
 update specific_product
 set product_rating='4', product_rating_comment='My neighbor is making a lot of noise', product_rating_date='05-APR-20'
 where product_id='30'
+
+alter table warehouse
+add (warehouse_type varchar(20),
+    constraint fk_warehouse__warehouse_type
+    foreign key (warehouse_type)
+    references warehouse_type(warehouse_type))
+
+update warehouse
+set warehouse_type = 'refrigerated'
+where warehouse_id in ('12', '23', '34')
+
+update warehouse
+set warehouse_type = 'non-refrigerated'
+where warehouse_id in ('45', '56')
+
+drop table warehouse_inventory
+
+alter table specific_product
+add (warehouse_id varchar(20),
+    constraint fk_specific_product__warehouse
+    foreign key (warehouse_id)
+    references warehouse(warehouse_id))
+
+drop table product_type__product_name
+
+alter table general_product
+add
+(
+    product_type varchar(20),
+    constraint fk_general_product__product_type
+    foreign key (product_type)
+    references product_type(product_type)
+)
+
+update general_product
+set product_type = 'fruit'
+where product_name in ('apple','orange','banana','starfruit','kiwi','mango','peach')
+
+update general_product
+set product_type = 'meat'
+where product_name in ('beef','pork','lamb')
+
+update general_product
+set product_type = 'grain'
+where product_name in ('rice','bread','gluten')
+
+update general_product
+set product_type = 'dairy'
+where product_name in ('milk','chocolate_milk')
+
+update general_product
+set product_type = 'beverage'
+where product_name in ('apple_juice','orange_juice','banana_smoothie','coke','fanta')
+
+update specific_product
+set warehouse_id = '12'
+where warehouse_id is null
+
+update specific_product
+set warehouse_id = '45'
+where product_name in (
+    select product_name
+    from general_product
+    where product_type in ('beverage','fruit','grain')
+)
+
+alter table customer
+add (borough varchar(20),
+	constraint fk_customer__borough
+	foreign key (borough)
+	references borough(borough)
+
+
+update customer
+set borough = 'Staten_Island'
+where cust_email in ('grappli@gmail.com','headcorn@gmail.com','mousero@gmail.com')
+
+update customer
+set borough = 'Brooklyn'
+where cust_email in ('google@gmail.com','cloud@gmail.com','bottle@gmail.com')
+
+update customer
+set borough = 'Manhattan'
+where cust_email in ('momi@gmail.com','totu@gmail.com','facebook@gmail.com')
+
+update customer
+set borough = 'Bronx'
+where cust_email in ('sun@gmail.com','zebrasan@gmail.com','pocky@gmail.com')
+
+update customer
+set borough = 'Queens'
+where cust_email in ('floor@gmail.com','door@gmail.com','ocean@gmail.com')
+
+alter table purchase
+rename column time_purchased to purchase_date
+
+insert into purchase(purchase_id, cust_email, purchase_date, method_of_payment, delivery_address, date_delivered, delivery_rating, delivery_rating_comment, delivery_rating_date)
+values('13','sun@gmail.com','03-MAY-20', 'credit', '4 apple ave', '05-MAY-20','5','great','05-MAY-20')
+
+insert into purchase(purchase_id, cust_email, purchase_date, method_of_payment, delivery_address, date_delivered, delivery_rating, delivery_rating_comment, delivery_rating_date)
+values('14','google@gmail.com','03-MAY-20', 'credit', '10 apple ave', '05-MAY-20','5','great','05-MAY-20')
+
+insert into purchase(purchase_id, cust_email, purchase_date, method_of_payment, delivery_address, date_delivered, delivery_rating, delivery_rating_comment, delivery_rating_date)
+values('15','headcorn@gmail.com','03-MAY-20', 'credit', '14 apple ave', '05-MAY-20','5','great','05-MAY-20')
+
+update specific_product
+set purchase_id = '13'
+where product_id = '2'
+
+update specific_product
+set purchase_id = '14'
+where product_id = '3'
+
+update specific_product
+set purchase_id = '15'
+where product_id = '4'
+
+grant select on purchase to staff

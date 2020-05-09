@@ -103,6 +103,15 @@ add product_rating_method varchar(20) default 'number system'
 -- 				(product_rating is null and (product_rating_comment is not null or product_rating_date is not null))
 -- 		))
 
+
+
+-- alter table purchase
+-- add constraint rate_only_if_purchase
+--     check (NOT(
+-- 				(purchase_id is null and product_rating is not null) or 
+-- 				(product_rating is null and (product_rating_comment is not null or product_rating_date is not null))
+-- 		))
+
 alter table purchase
 add (
 	delivery_rating varchar(30), 
@@ -111,13 +120,6 @@ add (
 	method_of_rating varchar(30) default 'number system',
 	tip number(9,2)
 )
-
--- alter table purchase
--- add constraint rate_only_if_purchase
---     check (NOT(
--- 				(purchase_id is null and product_rating is not null) or 
--- 				(product_rating is null and (product_rating_comment is not null or product_rating_date is not null))
--- 		))
 
 alter table purchase
 rename column method to  method_of_payment
@@ -160,6 +162,10 @@ add constraint fk_purchase__method_of_payment
 
 create sequence first_seq
     start with 1000
+    increment by 1
+
+create sequence second_seq
+    start with 1234234534564567
     increment by 1
 
 grant select on purchase to customer

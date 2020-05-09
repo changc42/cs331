@@ -1,41 +1,21 @@
 -----------------------------------------------------------------------------------
---1.Identifycustomers who have not completed a purchase/delivery surveyin the last 6 months.  Display the customer name and email. Use a nested select to answer this question.
+--1.Identifycustomers who have not completed a purchase/delivery survey since Jan 1st, 2020.  Display the customer name and email. Use a nested select to answer this question.
 ------------------------------------------------------------------------------------
---note: this query can be done without using nested select. However, since you ask us to use a nested select I have created a redundant nested select version of the the original query which does not use nested select
 
---nested select way
-select c.cust_email, full_name
-from customer c, purchase p
+select cust_email, full_name
+from customer
 where
-	c.cust_email = p.cust_email and
-	c.cust_email in
-		(select c.cust_email
-		from customer c, purchase p
-		where 
-			c.cust_email = p.cust_email and
-			delivery_rating_date is null)
-group by c.cust_email, full_name
-
---normal way
-select c.cust_email, full_name
-from customer c, purchase p
-where
-	c.cust_email = p.cust_email and
-	delivery_rating_date is null
-group by c.cust_email, full_name
+    cust_email not in(
+        select cust_email
+        from purchase p
+        where delivery_rating_date > '01-JAN-20'
+    )
 
 -----------------------------------------------------------------------------------
---2.Identify the most popular product purchased in the last month. Display fourcolumns: warehouse,productname,product typeand number of orders. Display one distinct row for eachwarehouse, productand product type.Display the productwith the most ordersfirst.
+--2.Identify the most popular product purchased since Jan 1st, 2000. Display fourcolumns: warehouse,productname,product typeand number of orders. Display one distinct row for eachwarehouse, productand product type.Display the productwith the most ordersfirst.
 ------------------------------------------------------------------------------------
 
-select s.warehouse_id, s.product_name, product_type, count(*) as number_of_orders
-from specific_product s, general_product g
-where
-	s.product_name = g.product_name and
-    purchase_id is not null
-group by
-	s.warehouse_id, s.product_name, product_type
-order by number_of_orders desc
+
 
 -----------------------------------------------------------------------------------
 --3.Identify customers with the most purchases of fruit on or after jan 01, 2016 by customer location.  Display five rows in your output –one row for each borough.  Display three columns: borough, number of orders, total dollar amount of order. The borough with the most orders is displayed first.  You may need multiple SQL to answer this question.
@@ -118,10 +98,10 @@ where
 --administrative user is called 'project2'
 --logged in as customer
 
---part a
+--customers can view orders. part a
 select * from project2.purchase
 
---part b
+--customers cannot change past orders. part b
 update project2.purchase
 set delivery_rating='5'
 where purchase_id='1'
@@ -149,6 +129,7 @@ select * from project2.view_staff__purchase
 --as user project2
 revoke delete on view_staff__purchase from staff
 
+--try to delete
 delete from project2.view_staff__purchase
 where cust_email='floor@gmail.com'
 
@@ -166,7 +147,7 @@ where product_name='Raisin Bran'
 --before
 create table customer_copy as select * from customer
 
---original, part a
+--original data, part a
 select * from customer_copy
 
 --as user1
@@ -190,3 +171,44 @@ rollback
 
 --exit both windows and open new window, part d
 select * from customer_copy
+
+-----------------------------------------------------------------------------------
+--11.In one SQL window, delete all dairyproducts. Don’t commit. In another SQL window, delete all productsDon’t commit. Explain your results. Resolve the problem. Create a backup of your table before implementing. To create a backup table, enter CREATE TABLE <NEWTABLE> AS SELECT * FROM <ORIGINALTABLE>; COMMIT; Then you can rename a table using the RENAME TABLE commit.  Disable the autocommit flag at the top of the windowbefore performing this operation.Show all SQL to perform these operations.Demonstrate the functionally of your SQL by displaying the before and after results.
+
+------------------------------------------------------------------------------------
+
+create table specific_product_copy as
+(
+select * from specific_product
+)
+
+--original data, part a
+select * from specific_product
+
+--in window1
+delete from specific_product
+where product_name in(
+select product_name
+from general_product
+where product_type = 'dairy')
+
+--in window2
+delete from specific_product
+
+--in window2, there is a stall
+
+--to resolve problem, delete all the non-dairy products
+delete from specific_product
+where product_name not in(
+select product_name
+from general_product
+where product_type = 'dairy')
+
+--in window1 part b
+select * from specific_product
+
+--in window 2, partc
+select * from specific_product
+
+--exit both windows, open new window part d
+select * from specific_product

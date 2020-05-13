@@ -92,6 +92,27 @@ where
 	product_rating_comment is null
 
 -----------------------------------------------------------------------------------
+--5.Search the open-endednarrative text/commentsin the productand delivery comments to identify personally identifiable information (PII).  This includes any data that could potentially be used to identify a person.  For instance,examples of PII includeemail address, date of birth, Social Security number, bank account number, home address, and full name. Display the customerwho created the comment, date of comment and the comment.Order the output bycustomername.
+------------------------------------------------------------------------------------
+
+select full_name, delivery_rating_date, delivery_rating_comment, product_rating_date, product_rating_comment 
+from specific_product s, purchase p, customer c
+where 
+	s.purchase_id = p.purchase_id and
+	p.cust_email = c.cust_email and
+	(
+		REGEXP_LIKE(delivery_rating_comment, '[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]') or
+		REGEXP_LIKE(delivery_rating_comment, '@.+\..+') or
+		REGEXP_LIKE(delivery_rating_comment, 'street') or
+		REGEXP_LIKE(delivery_rating_comment, '[0-9][0-9]/[0-9][0-9]/[0-9][0-9]') or
+		REGEXP_LIKE(product_rating_comment, '[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]') or		
+		REGEXP_LIKE(product_rating_comment, '@.+\..+') or		
+		REGEXP_LIKE(product_rating_comment, 'street') or		
+		REGEXP_LIKE(product_rating_comment, '[0-9][0-9]/[0-9][0-9]/[0-9][0-9]')
+	)
+order by full_name
+
+-----------------------------------------------------------------------------------
 --6.Customers can view, but not change past orders. Create SQL to implement. Demonstrate your implementation will not edit past ordersby attempting to change data.
 ------------------------------------------------------------------------------------
 
@@ -212,3 +233,30 @@ select * from specific_product
 
 --exit both windows, open new window part d
 select * from specific_product
+
+-----------------------------------------------------------------------------------
+--12.In one SQL window, change the password for the customer Mia Yang.Don’t commit. In another SQL window, change the last name of customerMia Yang(use the same name as above).Don’t commit. Quit both Oracle sessions. Login to Oracle again and display all columnsfor the customerMia Yang. Explain your results.  Disable the autocommit flag at the top of the windows before performing this operation.Show all SQL to perform these operations.Demonstrate the functionally of your SQL by displaying the before and after results.
+
+------------------------------------------------------------------------------------
+
+-- part a: original data
+select * from customer
+
+--partb: changed pw
+update customer
+set password_='tim455'
+where cust_email='floor@gmail.com'
+
+select * from customer
+
+--changed last name
+update customer
+set full_name='Mia Lang'
+where cust_email = 'floor@gmail.com'
+
+--stall. waiting for first window to commit
+
+--part c: quit both sessions. start new session. resulting data
+select * from customer
+
+--explanation: The first window modified a row and put a lock on the row. The second window tried to modify the same row, but had to wait for the first window to release the lock. When quit both oracle sessions, uncommitted changes are discarded. New session will have original, unmodified data.

@@ -170,11 +170,11 @@ create sequence second_seq
 
 grant select on purchase to customer
 
--- select * from specific_product
--- where product_rating_comment like '%[1:9][1:9][1:9]-[1:9][1:9][1:9]-[1:9][1:9][1:9][1:9]%' or
--- 	product_rating_comment like '%@%.com' or
--- 	product_rating_comment like '%street%' or
--- 	product_rating_comment like '%[1:9][1:9]/[1:9][1:9]/[1:9][1:9]%'
+select * from specific_product
+where product_rating_comment like '%[1:9][1:9][1:9]-[1:9][1:9][1:9]-[1:9][1:9][1:9][1:9]%' or
+	product_rating_comment like '%@%.com' or
+	product_rating_comment like '%street%' or
+	product_rating_comment like '%[1:9][1:9]/[1:9][1:9]/[1:9][1:9]%'
 
 alter table purchase
 modify (delivery_rating_comment varchar(150))
